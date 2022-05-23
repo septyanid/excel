@@ -95,9 +95,15 @@ class CustomerController extends Controller
 
   public function importFile(ImportRequest $request)
   {
-    // dd($request->all());
+    try {
 
-    Excel::import(new CustomersImport, $request->formFile);
+      Excel::import(new CustomersImport, $request->formFile);
+
+    } catch (\Throwable $th) {
+
+      return back()->with('failed', 'Oops, there is something wrong');
+
+    }
 
     return back()->with('success', 'All Good');
   }
