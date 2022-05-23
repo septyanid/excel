@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ImportRequest;
 use App\Models\Customer;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
+use App\Imports\CustomersImport;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CustomerController extends Controller
 {
@@ -16,7 +19,10 @@ class CustomerController extends Controller
    */
   public function index()
   {
-    $customers = DB::table('customers')->get();
+    $customers = DB::table('customers')
+    ->join('genders', 'customers.gender_id', '=', 'genders.id')
+    ->select('customers.*', 'genders.name as gender')
+    ->get();
 
     return view('customers.index', compact('customers'));
   }
@@ -85,5 +91,14 @@ class CustomerController extends Controller
   public function destroy(Customer $customer)
   {
     //
+  }
+
+  public function importFile(ImportRequest $request)
+  {
+    // dd($request->all());
+
+    Excel::import(new CustomersImport, $request->formFile);
+
+    return back()->with('success', 'All Good');
   }
 }

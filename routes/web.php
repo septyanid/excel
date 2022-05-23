@@ -19,3 +19,7 @@ Route::get('/', function () {
 });
 
 Route::resource('customers', CustomerController::class);
+
+Route::controller(CustomerController::class)->group(function() {
+  Route::post('employee-import', 'importFile')->name('employee-import');
+});
